@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>太虚问道 · 生死修行</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="太虚问道">
+<meta name="theme-color" content="#0b0f1a">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="starfield" aria-hidden="true"></div>
+
+<header class="topbar">
+  <div class="brand-wrap">
+    <img id="brandAvatar" class="brand-avatar" src="assets/sword.png" alt="">
+    <div>
+      <div class="brand">太虚问道</div>
+      <div class="subtitle">一念登仙 · 一战散功</div>
+    </div>
+  </div>
+  <div class="top-stats">
+    <span>境界 <b id="realmText">炼气·初期</b></span>
+    <span>修为 <b id="cultivationText">0 / 1000</b></span>
+    <span>战力 <b id="powerText">0</b></span>
+    <span>灵石 <b id="goldText">1000</b></span>
+    <span>修炼丹 <b id="pillsText">0</b></span>
+  </div>
+  <div class="dock">
+    <button class="dock-btn" data-page="home" title="修炼台">🏠<i>修炼台</i></button>
+    <button class="dock-btn" data-page="battle" title="斗法场">⚔<i>斗法</i></button>
+    <button class="dock-btn" data-page="sub" title="辅修">🀄<i>辅修</i></button>
+    <button class="dock-btn" data-page="equip" title="法宝">💎<i>法宝</i></button>
+    <button class="dock-btn" data-page="wild" title="秘境">🐾<i>秘境</i></button>
+    <button class="dock-btn" data-page="tower" title="万妖塔">🏯<i>万妖塔</i></button>
+    <button class="dock-btn" data-page="quest" title="悬赏">📜<i>悬赏</i></button>
+    <button class="dock-btn" data-page="achieve" title="成就">🏆<i>成就</i></button>
+    <button class="dock-btn" data-page="rank" title="天道榜">📊<i>天道榜</i></button>
+    <button class="dock-btn" data-page="chat" title="世界频道">🌐<i>世界</i></button>
+    <button class="dock-btn" data-page="settings" title="设置">⚙<i>设置</i></button>
+  </div>
+</header>
+
+<main class="stage">
+
+  <!-- 页面：修炼台（主画面 · 非战斗修为进度） -->
+  <section id="page_home" class="page active">
+    <div class="page-head">
+      <div><div class="eyebrow">主画面</div><h1>修炼台 · 修为进度</h1></div>
+      <button class="ghost" data-page="battle">⚔ 进入斗法场</button>
+    </div>
+    <div class="home-head">
+      <div class="avatar-ring big"><img id="playerAvatar" class="avatar" src="assets/sword.png" alt=""></div>
+      <div class="hero-info">
+        <div id="playerName" class="name">无名散修</div>
+        <div id="classText" class="muted">剑修</div>
+        <div id="homeRealm" class="realm-chip">炼气 · 初期</div>
+      </div>
+      <div class="home-quick">
+        <div class="home-stat"><small>连胜</small><b id="homeStreak">0</b></div>
+        <div class="home-stat"><small>道心</small><b id="homeDao">50</b></div>
+      </div>
+    </div>
+
+    <div class="home-section">
+      <div class="bar-label"><span>修为进度</span><span id="cultivationPct">0%</span></div>
+      <div class="bar big"><i id="cultivationBar"></i></div>
+      <div class="home-cult muted" id="homeCultText">0 / 1,000</div>
+    </div>
+
+    <div class="stat-grid">
+      <div><small>生命</small><b id="hpStat">0</b></div>
+      <div><small>攻击</small><b id="atkStat">0</b></div>
+      <div><small>防御</small><b id="defStat">0</b></div>
+      <div><small>速度</small><b id="speedStat">0</b></div>
+    </div>
+
+    <div class="home-actions">
+      <button id="cultivateBtn" class="primary">安全修炼（耗1丹）</button>
+      <button id="tribulationBtn" disabled>渡劫飞升</button>
+      <button id="battleGateBtn" class="primary">进入斗法场</button>
+    </div>
+
+    <div class="home-misc">
+      <div class="bar-label"><span>道心</span><span id="daoText">50</span></div>
+      <div class="bar dao"><i id="daoBar"></i></div>
+      <div class="muted" id="daoHint">连胜越高，生死战收益越高。</div>
+    </div>
+
+    <div class="home-section">
+      <h2>道途（开局择一）</h2>
+      <div id="classList" class="class-list"></div>
+    </div>
+  </section>
+
+  <!-- 页面：斗法场（战斗场景） -->
+  <section id="page_battle" class="page">
+    <div class="page-head">
+      <div>
+        <div class="eyebrow" id="battleEyebrow">同境界生死战</div>
+        <h1 id="battleTitle">青云斗法场</h1>
+      </div>
+      <div class="pill" id="battleStatus">等待挑战</div>
+    </div>
+
+    <div class="arena">
+      <canvas id="battleCanvas" width="900" height="470"></canvas>
+      <div class="combatants">
+        <div class="combatant">
+          <img id="pAvatarImg" class="cavatar" src="assets/sword.png" alt="">
+          <div class="combatant-info">
+            <div class="combatant-name"><span id="pName">无名散修</span><span id="pClass">剑修</span></div>
+            <div class="bar hp"><i id="playerHpBar"></i></div>
+            <div class="small-row"><span>HP <b id="playerHp">0</b></span><span>战力 <b id="playerPower">0</b></span></div>
+          </div>
+        </div>
+        <div class="versus">VS</div>
+        <div class="combatant enemy">
+          <img id="eAvatarImg" class="cavatar" src="assets/monster.png" alt="">
+          <div class="combatant-info">
+            <div class="combatant-name"><span id="eName">对手</span><span id="eClass">—</span></div>
+            <div class="bar hp"><i id="enemyHpBar"></i></div>
+            <div class="small-row"><span>HP <b id="enemyHp">0</b></span><span>战力 <b id="enemyPower">0</b></span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="skill-row" id="skillRow"></div>
+
+    <div class="actions">
+      <button id="challengeBtn" class="primary">寻找同境界对手</button>
+      <button id="retreatBtn" class="danger" disabled>退出战斗</button>
+      <button id="autoBtn" class="auto-toggle" title="本场自动">自动 · 开</button>
+      <button id="exitBattleBtn" title="返回修炼台">🏠 修炼台</button>
+    </div>
+
+    <div class="battle-log" id="battleLog"></div>
+  </section>
+
+  <!-- 页面：辅修 -->
+  <section id="page_sub" class="page">
+    <div class="page-head"><div><div class="eyebrow">修炼体系</div><h1>🀄 辅修道途</h1></div><button class="ghost" data-page="home">← 修炼台</button></div>
+    <div id="subBox" class="sub-box"></div>
+  </section>
+
+  <!-- 页面：法宝装备 -->
+  <section id="page_equip" class="page">
+    <div class="page-head"><div><div class="eyebrow">装备养成</div><h1>💎 法宝装备</h1></div><button class="ghost" data-page="home">← 修炼台</button></div>
+    <div id="equipList" class="equip-box"></div>
+  </section>
+
+  <!-- 页面：野外秘境 -->
+  <section id="page_wild" class="page">
+    <div class="page-head"><div><div class="eyebrow">野外猎杀</div><h1>🐾 野外秘境</h1></div><button class="ghost" data-page="home">← 修炼台</button></div>
+    <div id="wildList" class="wild-list"></div>
+  </section>
+
+  <!-- 页面：万妖塔 -->
+  <section id="page_tower" class="page">
+    <div class="page-head"><div><div class="eyebrow">登峰挑战</div><h1>🏯 万妖塔</h1></div><button class="ghost" data-page="home">← 修炼台</button></div>
+    <div id="towerBox" class="sub-box"></div>
+  </section>
+
+  <!-- 页面：除魔悬赏 -->
+  <section id="page_quest" class="page">
+    <div class="page-head"><div><div class="eyebrow">每日任务</div><h1>📜 除魔悬赏</h1></div><button class="ghost" data-page="home">← 修炼台</button></div>
+    <div id="questBox" class="quest-box"></div>
+  </section>
+
+  <!-- 页面：成就 -->
+  <section id="page_achieve" class="page">
+    <div class="page-head"><div><div class="eyebrow">修行印记</div><h1>🏆 成就</h1></div><button class="ghost" data-page="home">← 修炼台</button></div>
+    <div id="achieveBox" class="achieve-box"></div>
+  </section>
+
+  <!-- 页面：天道榜 -->
+  <section id="page_rank" class="page">
+    <div class="page-head"><div><div class="eyebrow">众生修为</div><h1>📊 天道榜</h1></div><button class="ghost" data-page="home">← 修炼台</button></div>
+    <div id="ranking"></div>
+  </section>
+
+  <!-- 页面：设置 -->
+  <section id="page_settings" class="page">
+    <div class="page-head"><div><div class="eyebrow">偏好</div><h1>⚙ 设置</h1></div><button class="ghost" data-page="home">← 修炼台</button></div>
+    <div id="settingsBox"></div>
+  </section>
+
+  <!-- 页面：世界频道 -->
+  <section id="page_chat" class="page">
+    <div class="page-head"><div><div class="eyebrow">众生言谈 · 现代语</div><h1>🌐 世界频道</h1></div><button class="ghost" data-page="home">← 修炼台</button></div>
+    <div id="worldChat" class="chat"></div>
+    <div class="chat-input"><input id="chatInput" placeholder="@修士名（长按昵称可@）或输入想说的话…" maxlength="60"><button id="chatSend">说</button></div>
+  </section>
+
+  <!-- 页面：道友资料 -->
+  <section id="page_profile" class="page">
+    <div class="page-head"><div><div class="eyebrow">道友资料</div><h1>📋 属性 · 修为 · 法宝</h1></div><button class="ghost" data-page="chat">← 世界频道</button></div>
+    <div id="profileBox"></div>
+  </section>
+
+</main>
+
+<div id="modal" class="modal hidden">
+  <div class="modal-card" id="modalContent"></div>
+</div>
+<script src="game.js"></script>
+</body>
+</html>
