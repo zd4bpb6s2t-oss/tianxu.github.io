@@ -1,5 +1,5 @@
 # tianxu.github.iowebsite/
-├─ index.html    ✅ 必须要有
+├─ index.html
 ├─ css/
 │  └─ style.css
 ├─ js/
